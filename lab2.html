@@ -13,7 +13,7 @@
 
 <meta name="date" content="2022-11-24" />
 
-<title>Лабораторная работа №2, задание 6</title>
+<title>Лабораторная работа №2</title>
 
 <script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
 // be compatible with the behavior of Pandoc < 2.8).
@@ -350,7 +350,7 @@ display: none;
 
 
 
-<h1 class="title toc-ignore">Лабораторная работа №2, задание 6</h1>
+<h1 class="title toc-ignore">Лабораторная работа №2</h1>
 <h4 class="author">Ефременко Влада</h4>
 <h4 class="date">2022-11-24</h4>
 
@@ -358,8 +358,8 @@ display: none;
 
 
 <hr />
-<div id="задание" class="section level2">
-<h2>Задание</h2>
+<div id="задание-6" class="section level2">
+<h2>Задание 6</h2>
 <p>Используйте файл ExpImp.Rdata Напишите функцию, которая по названию
 федерального округа находит те субъекты федерации, которые принадлежат
 этому федеральному округу и в которых суммарный экспорт превышает
@@ -431,6 +431,176 @@ print(result)</code></pre>
 ## #   Округ &lt;chr&gt;, Delta &lt;dbl&gt;, and abbreviated variable names ¹​ПродЭкспорт,
 ## #   ²​ПродИмпорт, ³​ТЭКЭкспорт, ⁴​ТЭКИмпорт, ⁵​ХимЭкспорт, ⁶​ХимИмпорт,
 ## #   ⁷​ДревЭкспорт, ⁸​ДревИмпорт, ⁹​МетЭкспорт</code></pre>
+<hr />
+</div>
+<div id="задание-21" class="section level2">
+<h2>Задание 21</h2>
+<p>Используйте файл Payment_and_value_of_Care-Hospital.csv Для каждой из
+возможных услуг найдите больницу, в которой эта услуга является самой
+дешёвой. Результат представьте в виде списка. Помимо названия больницы,
+укажите штат, округ и город в котором эта больница расположена.</p>
+<hr />
+<p>Используемые пакеты:</p>
+<pre class="r"><code>library(readr)
+library(stringr)
+library(dplyr)</code></pre>
+<hr />
+<p>Путь до файла с данными:</p>
+<pre class="r"><code>path = &#39;/Users/vladaefremenko/R_Lab2/data/Payment_and_value_of_care-Hospital.csv&#39;</code></pre>
+<hr />
+<p>Функция получает на вход необработанную таблицу с данными о стоимости
+лечения. Исключаем из таблицы строки, где отсутствует стоимость, затем
+сортируем таблицу последовательно по наименованию услуг, категории услуг
+и стоимости, оставляем больницы с наименьшей стоимостью услуги:</p>
+<pre class="r"><code>get_res_table &lt;- function(data){
+  flt &lt;- !str_detect(data$Payment, &#39;Not Available&#39;)
+  data &lt;- filter(data, flt)
+  data &lt;- arrange(data, data[,&#39;Value of Care Display Name&#39;], 
+                  data[,&#39;Value of Care Category&#39;], data$Payment)
+  unique &lt;- distinct(data, data[,&#39;Value of Care Display Name&#39;], 
+                     data[,&#39;Value of Care Category&#39;],.keep_all = TRUE)
+  res &lt;- data.frame(unique$`Value of Care Display Name`,
+                    unique$`Value of Care Category`,
+                    unique$Payment, 
+                    unique$`Facility Name`, 
+                    unique$City, 
+                    unique$State, 
+                    unique$`County Name`)
+  res &lt;- rename_with(res, ~ gsub(&quot;.&quot;, &quot; &quot;, .x, fixed = TRUE))
+  res &lt;- rename_with(res, ~ gsub(&quot;unique&quot;, &quot;&quot;, .x, fixed = TRUE))
+  
+  return(res)
+}</code></pre>
+<hr />
+<p>Исполняемый код - считываем данные из .csv файла, получаем измененную
+таблицу, печатаем ответ:</p>
+<pre class="r"><code>df &lt;- read_csv(path)</code></pre>
+<pre><code>## Rows: 18692 Columns: 22
+## ── Column specification ────────────────────────────────────────────────────────
+## Delimiter: &quot;,&quot;
+## chr (20): Facility ID, Facility Name, Address, City, State, ZIP Code, County...
+## dbl  (2): Payment Footnote, Value of Care Footnote
+## 
+## ℹ Use `spec()` to retrieve the full column specification for this data.
+## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+<pre class="r"><code>result &lt;- get_res_table(df)
+print(result)</code></pre>
+<pre><code>##           Value of Care Display Name                    Value of Care Category 
+## 1  Value of Care Heart Attack measure     Average Mortality and Average Payment
+## 2  Value of Care Heart Attack measure      Average Mortality and Higher Payment
+## 3  Value of Care Heart Attack measure       Average Mortality and Lower Payment
+## 4  Value of Care Heart Attack measure      Better Mortality and Average Payment
+## 5  Value of Care Heart Attack measure       Better Mortality and Higher Payment
+## 6  Value of Care Heart Attack measure        Better Mortality and Lower Payment
+## 7  Value of Care Heart Attack measure                             Not Available
+## 8  Value of Care Heart Attack measure       Worse Mortality and Average Payment
+## 9  Value of Care Heart Attack measure        Worse Mortality and Higher Payment
+## 10 Value of Care Heart Failure measur     Average Mortality and Average Payment
+## 11 Value of Care Heart Failure measur      Average Mortality and Higher Payment
+## 12 Value of Care Heart Failure measur       Average Mortality and Lower Payment
+## 13 Value of Care Heart Failure measur      Better Mortality and Average Payment
+## 14 Value of Care Heart Failure measur       Better Mortality and Higher Payment
+## 15 Value of Care Heart Failure measur        Better Mortality and Lower Payment
+## 16 Value of Care Heart Failure measur                             Not Available
+## 17 Value of Care Heart Failure measur       Worse Mortality and Average Payment
+## 18 Value of Care Heart Failure measur        Worse Mortality and Higher Payment
+## 19 Value of Care Heart Failure measur         Worse Mortality and Lower Payment
+## 20 Value of Care hip/knee replacement Average Complications and Average Payment
+## 21 Value of Care hip/knee replacement  Average Complications and Higher Payment
+## 22 Value of Care hip/knee replacement   Average Complications and Lower Payment
+## 23 Value of Care hip/knee replacement  Better Complications and Average Payment
+## 24 Value of Care hip/knee replacement    Better Complications and Lower Payment
+## 25 Value of Care hip/knee replacement   Worse Complications and Average Payment
+## 26 Value of Care hip/knee replacement    Worse Complications and Higher Payment
+## 27 Value of Care hip/knee replacement     Worse Complications and Lower Payment
+## 28    Value of Care Pneumonia measure                             Not Available
+##     Payment
+## 1   $23,438
+## 2   $28,657
+## 3   $20,016
+## 4   $24,854
+## 5   $28,891
+## 6   $24,530
+## 7   $26,023
+## 8   $26,067
+## 9   $29,443
+## 10  $15,862
+## 11  $19,038
+## 12  $14,032
+## 13  $17,291
+## 14  $19,280
+## 15  $15,875
+## 16  $17,494
+## 17  $16,854
+## 18  $19,472
+## 19  $15,407
+## 20  $18,592
+## 21  $21,479
+## 22  $13,536
+## 23  $20,303
+## 24  $16,711
+## 25  $20,640
+## 26  $22,027
+## 27  $18,865
+## 28  $12,386
+##                                                                          Facility Name 
+## 1                                                                   ST FRANCIS HOSPITAL
+## 2                                                                    METHODIST HOSPITAL
+## 3                                                                HIMA SAN PABLO BAYAMON
+## 4                                                                  ADVENTHEALTH REDMOND
+## 5                                                                   CAPE COD HEALTHCARE
+## 6                                                          RIVERSIDE METHODIST HOSPITAL
+## 7                                                   AURORA MEMORIAL HOSPITAL BURLINGTON
+## 8                                                       CAPE FEAR VALLEY MEDICAL CENTER
+## 9                                                              PIKEVILLE MEDICAL CENTER
+## 10                                                        BARRETT HOSPITAL &amp; HEALTHCARE
+## 11                                                  WILLIS KNIGHTON MEDICAL CENTER, INC
+## 12                                                    GUAM MEMORIAL  HOSPITAL AUTHORITY
+## 13                                              BETH ISRAEL DEACONESS HOSPITAL - MILTON
+## 14                                                       NEW YORK-PRESBYTERIAN HOSPITAL
+## 15                                                    PARKLAND HEALTH &amp; HOSPITAL SYSTEM
+## 16                                                           OAKDALE COMMUNITY HOSPITAL
+## 17                                                 SAMARITAN PACIFIC COMMUNITY HOSPITAL
+## 18                                            BAPTIST HEALTH MEDICAL CENTER-LITTLE ROCK
+## 19                                                 HOT SPRINGS COUNTY MEMORIAL HOSPITAL
+## 20                                                           UH CONNEAUT MEDICAL CENTER
+## 21                                                               JUPITER MEDICAL CENTER
+## 22                                                                 SPRINGFIELD HOSPITAL
+## 23 BRISTOW ENDEAVOR HEALTHCARE DBA CENTER FOR ORTHOPAEDIC RECONSTRUCTION AND EXCELLENCE
+## 24                                                 PEACEHEALTH SOUTHWEST MEDICAL CENTER
+## 25                                                     PROVIDENCE ALASKA MEDICAL CENTER
+## 26                                                                SAINT ANNE&#39;S HOSPITAL
+## 27                                                             BLOUNT MEMORIAL HOSPITAL
+## 28                                                  WHITFIELD MEDICAL SURGICAL HOSPITAL
+##            City  State   County Name 
+## 1    WILMINGTON     DE     NEW CASTLE
+## 2   SAN ANTONIO     TX          BEXAR
+## 3       BAYAMON     PR        BAYAMON
+## 4          ROME     GA          FLOYD
+## 5       HYANNIS     MA     BARNSTABLE
+## 6      COLUMBUS     OH       FRANKLIN
+## 7    BURLINGTON     WI         RACINE
+## 8  FAYETTEVILLE     NC     CUMBERLAND
+## 9     PIKEVILLE     KY           PIKE
+## 10       DILLON     MT     BEAVERHEAD
+## 11   SHREVEPORT     LA          CADDO
+## 12     TAMUNING     GU           GUAM
+## 13       MILTON     MA        NORFOLK
+## 14     NEW YORK     NY       NEW YORK
+## 15       DALLAS     TX         DALLAS
+## 16      OAKDALE     LA          ALLEN
+## 17      NEWPORT     OR        LINCOLN
+## 18  LITTLE ROCK     AR        PULASKI
+## 19  THERMOPOLIS     WY    HOT SPRINGS
+## 20     CONNEAUT     OH      ASHTABULA
+## 21      JUPITER     FL     PALM BEACH
+## 22  SPRINGFIELD     VT        WINDSOR
+## 23        JENKS     OK          TULSA
+## 24    VANCOUVER     WA          CLARK
+## 25    ANCHORAGE     AK      ANCHORAGE
+## 26   FALL RIVER     MA        BRISTOL
+## 27    MARYVILLE     TN         BLOUNT
+## 28    WHITFIELD     MS         RANKIN</code></pre>
 </div>
 
 
